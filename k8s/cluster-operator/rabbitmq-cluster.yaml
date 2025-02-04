@@ -1,0 +1,20 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: rabbitmq
+spec:
+  replicas: 3
+  persistence:
+    storageClassName: standard
+    size: 8Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 300Mi
+    limits:
+      cpu: 1000m
+      memory: 400Mi
+  podDisruptionBudget:
+    minAvailable: 1
+  service:
+    type: ClusterIP

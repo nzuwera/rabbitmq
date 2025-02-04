@@ -1,0 +1,88 @@
+services:
+  rabbitmq-0:
+    container_name: "rabbitmq-0"
+    image: "rabbitmq:4.0.2-management"
+    hostname: "rabbitmq-0"
+    env_file: .env
+    networks:
+      - rabbitmq
+    volumes:
+      - rabbitmq-0-data:/var/lib/rabbitmq
+      - ./cluster-entrypoint.sh:/usr/local/bin/cluster-entrypoint.sh
+    entrypoint: /usr/local/bin/cluster-entrypoint.sh
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  rabbitmq-1:
+    container_name: "rabbitmq-1"
+    image: "rabbitmq:4.0.2-management"
+    hostname: "rabbitmq-1"
+    env_file: .env
+    environment:
+      - JOIN_CLUSTER_HOST=rabbitmq-0
+    networks:
+      - rabbitmq
+    depends_on:
+      rabbitmq-0:
+        condition: service_healthy
+    volumes:
+      - rabbitmq-1-data:/var/lib/rabbitmq
+      - ./cluster-entrypoint.sh:/usr/local/bin/cluster-entrypoint.sh
+    entrypoint: /usr/local/bin/cluster-entrypoint.sh
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  rabbitmq-2:
+    container_name: "rabbitmq-2"
+    image: "rabbitmq:4.0.2-management"
+    hostname: "rabbitmq-2"
+    env_file: .env
+    environment:
+      - JOIN_CLUSTER_HOST=rabbitmq-0
+    networks:
+      - rabbitmq
+    depends_on:
+      rabbitmq-0:
+        condition: service_healthy
+    volumes:
+      - rabbitmq-2-data:/var/lib/rabbitmq
+      - ./cluster-entrypoint.sh:/usr/local/bin/cluster-entrypoint.sh
+    entrypoint: /usr/local/bin/cluster-entrypoint.sh
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    image: nginx:latest
+    container_name: "nginx-load-balancer"
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - rabbitmq
+    depends_on:
+      rabbitmq-0:
+        condition: service_healthy
+      rabbitmq-1:
+        condition: service_healthy
+      rabbitmq-2:
+        condition: service_healthy
+
+networks:
+  rabbitmq:
+    driver: bridge
+
+volumes:
+  rabbitmq-0-data:
+  rabbitmq-1-data:
+  rabbitmq-2-data:
