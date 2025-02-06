@@ -1,0 +1,83 @@
+replicaCount: 1 # Use an odd number according to https://www.rabbitmq.com/clustering.html#node-count
+image:
+  registry: docker.io
+  repository: bitnami/rabbitmq
+  tag: 4.0.2-debian-12-r0
+auth:
+  # Auth values should only be changed on first installation or when completely reinstalling rabbitmq
+  username: rabbitmq
+  password: DG8eMPFnsnRDnsO
+  erlangCookie: w2otM5C5E76tOmwE5K2gmHrU0nSUtiin
+resources:
+  requests:
+    cpu: 100m
+    memory: 300Mi
+  limits:
+    cpu: 1000m
+    memory: 400Mi
+
+commonLabels:
+  app: rabbitmq
+commonAnnotations: {}
+
+podLabels:
+  app: rabbitmq
+  plusng.mercedesbenz.com/ingress: traefik-external
+
+extraEnvVars:
+  - name: RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS # https://github.com/docker-library/rabbitmq/issues/249
+    value: '-rabbitmq_management path_prefix "/rabbitmq"' # path has to be equal to path in ingress of plus-dpc deployment
+service:
+  type: ClusterIP
+  port: 5672
+  portName: 'amqp'
+  managerPort: 15672
+  managerPortName: 'http-stats'
+memoryHighWatermark:
+  enabled: true
+spec:
+  restartPolicy: Always
+  containers:
+    - name: rabbitmq
+      command: ['kubectl rollout restart statefulset rabbitmq']
+# Enables Force-Boot in case rabbit-mq is not starting properly
+clustering:
+  forceBoot: true
+
+rbac:
+  create: false
+
+# Prometheus configuration, plugin is added by default since 3.8
+metrics:
+  enabled: false
+  serviceMonitor:
+    enabled: true
+
+customReadinessProbe:
+  exec:
+    command:
+      - sh
+      - -ec
+      - rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_local_alarms
+  initialDelaySeconds: 10
+  timeoutSeconds: 20
+  periodSeconds: 30
+# Readiness:  exec [/bin/bash -ec rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_local_alarms] delay=10s timeout=20s period=30s
+
+customLivenessProbe:
+  exec:
+    command:
+      - sh
+      - -ec
+      - rabbitmq-diagnostics -q ping
+  initialDelaySeconds: 120
+  timeoutSeconds: 20
+  periodSeconds: 30
+# Liveness:   exec [/bin/bash -ec rabbitmq-diagnostics -q ping] delay=120s timeout=20s period=30s
+
+# Network Policies
+networkPolicy:
+  enabled: true
+  allowExternal: false
+
+# Additional Pods Labels
