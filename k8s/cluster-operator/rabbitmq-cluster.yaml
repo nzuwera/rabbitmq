@@ -6,7 +6,7 @@ spec:
   replicas: 3
   persistence:
     storageClassName: standard
-    size: 8Gi
+    storage: 8Gi
   resources:
     requests:
       cpu: 100m
@@ -14,7 +14,5 @@ spec:
     limits:
       cpu: 1000m
       memory: 400Mi
-  podDisruptionBudget:
-    minAvailable: 1
   service:
     type: ClusterIP

@@ -1,0 +1,13 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: Policy
+metadata:
+  name: ha-policy
+spec:
+  rabbitmqClusterReference:
+    name: rabbitmq
+  name: ha-policy
+  pattern: "^"
+  definition:
+    ha-mode: all
+    ha-sync-mode: automatic
+  applyTo: queues
