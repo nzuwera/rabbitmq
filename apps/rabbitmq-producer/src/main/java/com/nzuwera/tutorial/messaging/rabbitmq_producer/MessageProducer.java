@@ -7,21 +7,28 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
-
 @Component
-public class QuorumMessageSender {
+public class MessageProducer {
 
     private final RabbitTemplate rabbitTemplate;
 
     @Autowired
-    public QuorumMessageSender(RabbitTemplate rabbitTemplate) {
+    public MessageProducer(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
     @Scheduled(fixedRate = 5000)
-    public void sendMessage() {
+    public void produceClassicMessages() {
+        String message = "Hello! Current time is %s in classic queues".formatted(LocalDateTime.now());
+        rabbitTemplate.convertAndSend(ProducerRabbitMQConfig.FANOUT_EXCHANGE, "", message);
+        System.out.println("Sent message: " + message);
+    }
+
+
+    @Scheduled(fixedRate = 5000)
+    public void produceQuorumMessages() {
         String message = "Hello! Current time is %s in quorum queues".formatted(LocalDateTime.now());
-        rabbitTemplate.convertAndSend(RabbitMQConfig.QUORUM_EXCHANGE, RabbitMQConfig.QUORUM_ROUTING_KEY, message);
+        rabbitTemplate.convertAndSend(ProducerRabbitMQConfig.FANOUT_EXCHANGE, "", message);
         System.out.println("Sent message: " + message);
     }
 }
