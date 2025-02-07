@@ -22,7 +22,7 @@ public class ProducerRabbitMQConfig {
 
     @Bean
     public Queue classicQueue() {
-        return new Queue(CLASSIC_QUEUE, false);
+        return new Queue(CLASSIC_QUEUE, true,false,false);
     }
 
     @Bean
@@ -41,7 +41,11 @@ public class ProducerRabbitMQConfig {
         args.put("x-queue-type", "quorum");  // Set queue type to quorum
         return new Queue(QUORUM_QUEUE, true, false, false, args);
     }
-/*
+    /**
+    // In case you need to process json messages
+    // Enable the below configuration
+
+
     @Bean
     public MessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
@@ -52,5 +56,6 @@ public class ProducerRabbitMQConfig {
         final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(messageConverter());
         return rabbitTemplate;
-    }*/
+    }
+    */
 }
