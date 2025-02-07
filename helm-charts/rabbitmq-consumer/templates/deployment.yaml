@@ -21,8 +21,10 @@ spec:
           ports:
             - containerPort: {{ .Values.service.port }}
           env:
+            - name: APP_PROFILE
+              value: "{{ .Values.service.profile }}"
             - name: RABBITMQ_HOST
-              value: "{{ .Values.rabbitmq.clusterName }}"
+              value: "{{ .Values.rabbitmq.hostName }}.{{ .Values.rabbitmq.namespace}}.svc.{{ .Values.rabbitmq.clusterDomain}}"
             - name: RABBITMQ_PORT
               value: "5672"
             - name: RABBITMQ_USER

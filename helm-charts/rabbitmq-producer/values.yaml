@@ -6,9 +6,12 @@ image:
   pullPolicy: Always
 
 rabbitmq:
-  clusterName: rabbitmq.rabbitmq-cluster.svc.cluster.local
+  namespace: rabbitmq-cluster
+  hostName: rabbitmq
+  clusterDomain: cluster.local
   secretName: "rabbitmq-default-user"
 
 service:
   type: ClusterIP
   port: 8080
+  profile: k8s
