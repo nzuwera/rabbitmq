@@ -10,7 +10,7 @@ build_and_push_app() {
   local DOCKER_REPO="$DOCKER_USERNAME/$APP_NAME"
 
   echo "Building the Spring Boot application: $APP_NAME..."
-  cd $APP_NAME/
+  cd "$APP_NAME"/ || exit 1
   gradle clean build
 
   # Check if the build was successful
