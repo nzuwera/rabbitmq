@@ -1,0 +1,6 @@
+apiVersion: v2
+name: rabbitmq-producer
+description: A Helm chart for Spring Boot RabbitMQ Producer
+type: application
+version: 0.2.1
+appVersion: "1.0.0"
