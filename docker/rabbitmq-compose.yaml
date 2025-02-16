@@ -1,78 +1,52 @@
 services:
-  rabbitmq-0:
-    container_name: "rabbitmq-0"
+  rabbitmq:
+    container_name: "rabbitmq"
     image: "rabbitmq:4.0.2-management"
     hostname: "rabbitmq-0"
-    env_file: rabbitmq-0.env
+    env_file: rabbitmq.env
     networks:
       - rabbitmq
     volumes:
-      - rabbitmq-0-data:/var/lib/rabbitmq
+      - rabbitmq-data:/var/lib/rabbitmq
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
       interval: 30s
       timeout: 10s
       retries: 3
 
-  rabbitmq-1:
-    container_name: "rabbitmq-1"
-    image: "rabbitmq:4.0.2-management"
-    hostname: "rabbitmq-1"
-    env_file: rabbitmq-1.env
+  rabbitmq-producer:
+    container_name: "rabbitmq-producer"
+    image: "nzuwera/rabbitmq-producer:1.2.0"
+    hostname: "rabbitmq-producer"
+    env_file: rabbitmq-producer.env
     networks:
       - rabbitmq
     depends_on:
-      rabbitmq-0:
+      rabbitmq:
         condition: service_healthy
-    volumes:
-      - rabbitmq-1-data:/var/lib/rabbitmq
-    healthcheck:
-      test: ["CMD", "rabbitmqctl", "status"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
-  rabbitmq-2:
-    container_name: "rabbitmq-2"
-    image: "rabbitmq:4.0.2-management"
-    hostname: "rabbitmq-2"
-    env_file: rabbitmq-2.env
+  rabbitmq-consumer:
+    container_name: "rabbitmq-consumer"
+    image: "nzuwera/rabbitmq-consumer:1.2.0"
+    hostname: "rabbitmq-consumer"
+    env_file: rabbitmq-consumer.env
     networks:
       - rabbitmq
     depends_on:
-      rabbitmq-0:
+      rabbitmq:
         condition: service_healthy
-    volumes:
-      - rabbitmq-2-data:/var/lib/rabbitmq
-    healthcheck:
-      test: ["CMD", "rabbitmqctl", "status"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  busybox:
-    container_name: "busybox"
-    image: "busybox:latest"
-    hostname: "busybox"
-    networks:
-      - rabbitmq
 
   nginx:
     image: nginx:latest
-    container_name: "nginx-load-balancer"
+    container_name: "nginx"
     ports:
-      - '5672:5672'
-      - '15672:15672'
+      - '80:80'
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
     networks:
       - rabbitmq
     depends_on:
-      rabbitmq-0:
-        condition: service_healthy
-      rabbitmq-1:
-        condition: service_healthy
-      rabbitmq-2:
+      rabbitmq:
         condition: service_healthy
 
 networks:
@@ -80,6 +54,4 @@ networks:
     driver: bridge
 
 volumes:
-  rabbitmq-0-data:
-  rabbitmq-1-data:
-  rabbitmq-2-data:
+  rabbitmq-data:
