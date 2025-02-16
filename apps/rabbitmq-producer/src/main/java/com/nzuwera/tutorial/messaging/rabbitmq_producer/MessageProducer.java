@@ -25,7 +25,7 @@ public class MessageProducer {
     @Scheduled(fixedRate = 5000)
     public void produceClassicMessages() {
         String message = "Hello! Current time is %s in classic queues".formatted(LocalDateTime.now());
-        rabbitTemplate.convertAndSend(ProducerRabbitMQConfig.FANOUT_EXCHANGE, "", message);
+        rabbitTemplate.convertAndSend(ProducerRabbitMQConfig.FANOUT_CLASSIC_EXCHANGE, "", message);
         logMessage(applicationProfile, message);
     }
 
@@ -34,6 +34,14 @@ public class MessageProducer {
     public void produceQuorumMessages() {
         String message = "Hello! Current time is %s in quorum queues".formatted(LocalDateTime.now());
         rabbitTemplate.convertAndSend(ProducerRabbitMQConfig.FANOUT_EXCHANGE, "", message);
+        logMessage(applicationProfile, message);
+    }
+
+
+    @Scheduled(fixedRate = 5000)
+    public void produceFixedQuorumMessages() {
+        String message = "Hello! Current time is %s in quorum queues".formatted(LocalDateTime.now());
+        rabbitTemplate.convertAndSend(ProducerRabbitMQConfig.FANOUT_FIXED_EXCHANGE, "", message);
         logMessage(applicationProfile, message);
     }
 

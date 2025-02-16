@@ -2,7 +2,7 @@
 
 # Variables
 DOCKER_USERNAME="nzuwera"  # Replace with your Docker Hub username
-VERSION="1.0.2"                            # Replace with your application version
+VERSION="1.0.3"                            # Replace with your application version
 
 # Function to build and push a single app
 build_and_push_app() {
