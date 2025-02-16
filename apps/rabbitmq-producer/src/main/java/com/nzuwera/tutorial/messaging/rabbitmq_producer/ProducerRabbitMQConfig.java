@@ -14,10 +14,21 @@ import java.util.Map;
 public class ProducerRabbitMQConfig {
     public static final String CLASSIC_QUEUE = "time-queue";
     public static final String FANOUT_EXCHANGE = "fanout-exchange";
+    public static final String FANOUT_CLASSIC_EXCHANGE = "fanout-classic-exchange";
+    public static final String FANOUT_FIXED_EXCHANGE = "fanout-fixed-exchange";
     public static final String QUORUM_QUEUE = "time-quorum-queue";
+    public static final String FIXED_QUORUM_QUEUE = "fixed-quorum-queue";
     @Bean
     public FanoutExchange fanoutExchange() {
         return new FanoutExchange(FANOUT_EXCHANGE);
+    }
+    @Bean
+    public FanoutExchange fanoutClassicExchange() {
+        return new FanoutExchange(FANOUT_CLASSIC_EXCHANGE);
+    }
+    @Bean
+    public FanoutExchange fanoutFixedExchange() {
+        return new FanoutExchange(FANOUT_FIXED_EXCHANGE);
     }
 
     @Bean
@@ -27,12 +38,22 @@ public class ProducerRabbitMQConfig {
 
     @Bean
     public Binding classicBinding() {
-        return BindingBuilder.bind(classicQueue()).to(fanoutExchange());
+        return BindingBuilder.bind(classicQueue()).to(fanoutClassicExchange());
     }
 
     @Bean
     public Binding quorumBinding() {
         return BindingBuilder.bind(quorumQueue()).to(fanoutExchange());
+    }
+
+    @Bean
+    public Binding fixedQuorumBinding() {
+        return BindingBuilder.bind(fixedQuorumQueue()).to(fanoutFixedExchange());
+    }
+
+    @Bean
+    public Queue fixedQuorumQueue() {
+        return new Queue(FIXED_QUORUM_QUEUE);
     }
 
     @Bean

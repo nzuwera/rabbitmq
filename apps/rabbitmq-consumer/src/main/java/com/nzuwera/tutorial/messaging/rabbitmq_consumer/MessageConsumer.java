@@ -19,6 +19,11 @@ public class MessageConsumer {
 
     @RabbitListener(queues = ConsumerRabbitMQConfig.QUORUM_QUEUE)
     public void quorumMessageReceiver(String message) {
-        log.info("Received {} quorum message: {}",applicationProfile, message);
+        log.info("Received {} new quorum message: {}",applicationProfile, message);
+    }
+
+    @RabbitListener(queues = ConsumerRabbitMQConfig.QUORUM_FIXED_QUEUE)
+    public void fixedQuorumMessageReceiver(String message) {
+        log.info("Received {} fixed quorum message: {}",applicationProfile, message);
     }
 }
